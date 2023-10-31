@@ -1,0 +1,119 @@
+[gd_scene load_steps=17 format=3 uid="uid://56swx8mnaldy"]
+
+[ext_resource type="Texture2D" uid="uid://bexjv0kogerco" path="res://assets/kenney_rpg-urban-pack/Tiles/tile_0024.png" id="1_7cyrf"]
+[ext_resource type="Script" path="res://src/Actors/Player.cs" id="1_frl2t"]
+[ext_resource type="Texture2D" uid="uid://ifypfqk65jep" path="res://assets/kenney_rpg-urban-pack/Tiles/tile_0051.png" id="2_t0lo7"]
+[ext_resource type="Texture2D" uid="uid://bqo5xm11lg6qa" path="res://assets/kenney_rpg-urban-pack/Tiles/tile_0078.png" id="3_ceb13"]
+[ext_resource type="Texture2D" uid="uid://cqir3luq4xqgg" path="res://assets/kenney_rpg-urban-pack/Tiles/tile_0023.png" id="4_g22mi"]
+[ext_resource type="Texture2D" uid="uid://d2lwodhi66igg" path="res://assets/kenney_rpg-urban-pack/Tiles/tile_0050.png" id="5_xfnt0"]
+[ext_resource type="Texture2D" uid="uid://jj0clpm17ua3" path="res://assets/kenney_rpg-urban-pack/Tiles/tile_0077.png" id="6_y63ni"]
+[ext_resource type="Texture2D" uid="uid://blfbuk4jrjghn" path="res://assets/kenney_rpg-urban-pack/Tiles/tile_0026.png" id="7_jd08m"]
+[ext_resource type="Texture2D" uid="uid://cx8wgn1rfhvni" path="res://assets/kenney_rpg-urban-pack/Tiles/tile_0053.png" id="8_d7n1b"]
+[ext_resource type="Texture2D" uid="uid://ct31hee8dyau6" path="res://assets/kenney_rpg-urban-pack/Tiles/tile_0080.png" id="9_ys4im"]
+[ext_resource type="Texture2D" uid="uid://bv11gb5wm4n3i" path="res://assets/kenney_rpg-urban-pack/Tiles/tile_0025.png" id="10_7rmbr"]
+[ext_resource type="Texture2D" uid="uid://dvsvxxg2xmhp1" path="res://assets/kenney_rpg-urban-pack/Tiles/tile_0052.png" id="11_hgnjx"]
+[ext_resource type="Texture2D" uid="uid://bku7nh1lnsq1m" path="res://assets/kenney_rpg-urban-pack/Tiles/tile_0079.png" id="12_ob8lj"]
+[ext_resource type="Script" path="res://src/Actors/StaminaConsumptionTimer.cs" id="14_5v7xs"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_hpkey"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_7cyrf")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_t0lo7")
+}, {
+"duration": 1.0,
+"texture": ExtResource("1_7cyrf")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_ceb13")
+}],
+"loop": true,
+"name": &"down",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("4_g22mi")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_xfnt0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_g22mi")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_y63ni")
+}],
+"loop": true,
+"name": &"left",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("7_jd08m")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_d7n1b")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_jd08m")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9_ys4im")
+}],
+"loop": true,
+"name": &"right",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("10_7rmbr")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11_hgnjx")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10_7rmbr")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12_ob8lj")
+}],
+"loop": true,
+"name": &"up",
+"speed": 5.0
+}]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_j2rh6"]
+radius = 8.0
+height = 28.0
+
+[node name="Player" type="CharacterBody2D"]
+script = ExtResource("1_frl2t")
+Speed = 125
+metadata/_edit_group_ = true
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+scale = Vector2(2, 2)
+sprite_frames = SubResource("SpriteFrames_hpkey")
+animation = &"left"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 2)
+shape = SubResource("CapsuleShape2D_j2rh6")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+
+[node name="StaminaConsumptionTimer" type="Timer" parent="."]
+wait_time = 3.0
+one_shot = true
+script = ExtResource("14_5v7xs")
+
+[node name="StaminaRegenerationTimer" type="Timer" parent="."]
+wait_time = 3.0
+
+[connection signal="StartStamina" from="." to="StaminaConsumptionTimer" method="_on_player_start_stamina"]
+[connection signal="StopStamina" from="." to="StaminaConsumptionTimer" method="_on_player_stop_stamina"]
+[connection signal="timeout" from="StaminaConsumptionTimer" to="." method="_on_stamina_consumption_timer_timeout"]
