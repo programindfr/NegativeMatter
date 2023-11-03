@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3 uid="uid://56swx8mnaldy"]
+[gd_scene load_steps=16 format=3 uid="uid://56swx8mnaldy"]
 
 [ext_resource type="Texture2D" uid="uid://bexjv0kogerco" path="res://assets/kenney_rpg-urban-pack/Tiles/tile_0024.png" id="1_7cyrf"]
 [ext_resource type="Script" path="res://src/Actors/Player.cs" id="1_frl2t"]
@@ -13,7 +13,6 @@
 [ext_resource type="Texture2D" uid="uid://bv11gb5wm4n3i" path="res://assets/kenney_rpg-urban-pack/Tiles/tile_0025.png" id="10_7rmbr"]
 [ext_resource type="Texture2D" uid="uid://dvsvxxg2xmhp1" path="res://assets/kenney_rpg-urban-pack/Tiles/tile_0052.png" id="11_hgnjx"]
 [ext_resource type="Texture2D" uid="uid://bku7nh1lnsq1m" path="res://assets/kenney_rpg-urban-pack/Tiles/tile_0079.png" id="12_ob8lj"]
-[ext_resource type="Script" path="res://src/Actors/StaminaConsumptionTimer.cs" id="14_5v7xs"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_hpkey"]
 animations = [{
@@ -93,6 +92,7 @@ height = 28.0
 [node name="Player" type="CharacterBody2D"]
 script = ExtResource("1_frl2t")
 Speed = 125
+StaminaSpeedMultiplierValue = 3.0
 metadata/_edit_group_ = true
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
@@ -109,11 +109,23 @@ shape = SubResource("CapsuleShape2D_j2rh6")
 [node name="StaminaConsumptionTimer" type="Timer" parent="."]
 wait_time = 3.0
 one_shot = true
-script = ExtResource("14_5v7xs")
+
+[node name="StaminaCooldownTimer" type="Timer" parent="."]
+wait_time = 5.0
+one_shot = true
 
 [node name="StaminaRegenerationTimer" type="Timer" parent="."]
 wait_time = 3.0
+one_shot = true
 
-[connection signal="StartStamina" from="." to="StaminaConsumptionTimer" method="_on_player_start_stamina"]
-[connection signal="StopStamina" from="." to="StaminaConsumptionTimer" method="_on_player_stop_stamina"]
+[node name="ProgressBar" type="ProgressBar" parent="."]
+offset_left = -550.0
+offset_top = -300.0
+offset_right = -450.0
+offset_bottom = -270.0
+size_flags_horizontal = 4
+max_value = 3.0
+step = 0.05
+
 [connection signal="timeout" from="StaminaConsumptionTimer" to="." method="_on_stamina_consumption_timer_timeout"]
+[connection signal="timeout" from="StaminaCooldownTimer" to="." method="_on_stamina_cooldown_timer_timeout"]
