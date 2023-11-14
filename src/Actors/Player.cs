@@ -9,7 +9,7 @@ public partial class Player : CharacterBody2D
 	public int Speed { get; set; } = 400;
 	// Valeur du bonnus d'endurance
 	[Export]
-	public double StaminaSpeedMultiplierValue { get; set; } = 1.15D;
+	public double StaminaSpeedMultiplierValue { get; set; } = 1.1D;
 	// Valeur du temps d'endurance
 	[Export]
 	public double StaminaTimeValue { get; set; } = 3.0D;
@@ -34,10 +34,16 @@ public partial class Player : CharacterBody2D
 		return false;
 	}
 	
-	private void _stop_stamina_consumption()
+	private bool _stop_stamina_consumption()
 	{
-		GetNode<Timer>("StaminaConsumptionTimer").Paused = true;
-		_start_stamina_cooldown();
+		var timer = GetNode<Timer>("StaminaConsumptionTimer");
+		if (!timer.IsStopped() && !timer.Paused)
+		{
+			timer.Paused = true;
+			_start_stamina_cooldown();
+			return true;
+		}
+		return false;
 	}
 	
 	private void _start_stamina_cooldown()
@@ -75,6 +81,8 @@ public partial class Player : CharacterBody2D
 	{
 		// Vecteur déplassement du joueur
 		Vector2 velocity = Vector2.Zero;
+		// Timer pour la conssomation d'endurance
+		var staminaConsumptionTimer = GetNode<Timer>("StaminaConsumptionTimer");
 
 		// Controles déplacement du joueur
 		if (Input.IsActionPressed("player_right"))
@@ -99,16 +107,16 @@ public partial class Player : CharacterBody2D
 		
 		if (Input.IsActionPressed("player_sprint"))
 		{
+			// Si le timer est en pause, on le reprend
 			if (_start_stamina_consumption())
 			{
 				_staminaSpeedMultiplier = StaminaSpeedMultiplierValue;
 			}
 		}
-		// _staminaSpeedMultiplier != 1
-		else if (Math.Abs(_staminaSpeedMultiplier - 1) > 0.001D)
+		// Si le timer est en cours on l'arrete
+		else if (_stop_stamina_consumption())
 		{
 			_staminaSpeedMultiplier = 1;
-			_stop_stamina_consumption();
 		}
 
 		// Gestion de l'annimation du joueur
@@ -147,14 +155,13 @@ public partial class Player : CharacterBody2D
 		
 		// Gestion de l'endurance
 		var regenerationTimer = GetNode<Timer>("StaminaRegenerationTimer");
-		var consumptionTimer = GetNode<Timer>("StaminaConsumptionTimer");
 		if (!regenerationTimer.IsStopped())
 		{
-			consumptionTimer.Start(StaminaTimeValue - regenerationTimer.TimeLeft);
+			staminaConsumptionTimer.Start(StaminaTimeValue - regenerationTimer.TimeLeft);
 		}
 		
 		var bar = GetNode<ProgressBar>("ProgressBar");
-		bar.Value = consumptionTimer.TimeLeft;
+		bar.Value = staminaConsumptionTimer.TimeLeft;
 		
 		//GD.Print(GetNode<Timer>("StaminaConsumptionTimer").TimeLeft);
 	}
